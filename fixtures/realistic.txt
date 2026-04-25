@@ -1,0 +1,5 @@
+| Tool | Permission | Data | Risk |
+| read_file | read | workspace files | safe |
+Secrets are never read.
+
+Operational note: run this in CI with --markdown and --sarif.
