@@ -1,38 +1,16 @@
-# GitHub Actions
-
-Use the minimal workflow when you only need a pass/fail gate. Use the reporting workflow when you want pull-request annotations, a job summary, and a SARIF artifact for code-scanning dashboards.
-
-Minimal gate:
-
-```yaml
-name: mcp-permission-matrix
-on: [push, pull_request]
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm test
-      - run: npm run check
-```
-
-Reporting gate:
-
-```yaml
 name: mcp-permission-matrix-report
 on: [push, pull_request]
+
 permissions:
   contents: read
   security-events: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Run matrix and write reports
         shell: bash
         run: |
@@ -43,11 +21,9 @@ jobs:
           npx --yes github:aolingge/mcp-permission-matrix --path README.md --sarif > mcp-permission-results.sarif
           cat mcp-permission-report.md >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
+
       - name: Upload SARIF
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: mcp-permission-results.sarif
-```
-
-The reporting workflow is also available as [examples/github-action-reporting.yml](../examples/github-action-reporting.yml).
