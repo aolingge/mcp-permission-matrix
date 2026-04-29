@@ -14,6 +14,19 @@ test('realistic fixture is usable for CI threshold', () => {
   assert.ok(report.score >= 75);
 });
 
+test('real-world server fixture passes and redacts secrets', () => {
+  const report = checkFile('fixtures/real_world_server.md');
+  assert.equal(report.score, 100);
+  assert.match(report.redacted, /token=\[REDACTED\]/);
+  assert.doesNotMatch(report.redacted, /super-secret-test-value/);
+});
+
+test('real-world fixture without risk section reports partial coverage', () => {
+  const report = checkFile('fixtures/real_world_missing_risk.md');
+  assert.equal(report.score, 75);
+  assert.equal(report.results.find((item) => item.id === 'risk').passed, false);
+});
+
 test('report formats are generated', () => {
   const report = checkFile('fixtures/weak.txt');
   assert.match(formatMarkdown(report), /Score:/);
